@@ -32,7 +32,7 @@ def cache1(x,a,b,c):
   """
   Another log 'on-top-of' the base fit
   Intended use: after the first treasure is released.
-  crossover_point is intended to be the new 'y-intercept'
+  turning_point is intended to be the new 'y-intercept'
   """
   return turning_point + b * np.log(a * x + c)
 
@@ -45,22 +45,6 @@ def variance(fit,data):
     var.append(fit[ind][1]-data[ind][1])
   return var
     
-#TI4_input='TI4_data'
-
-#csv_TI4 = np.genfromtxt(TI4_input,delimiter=",")
-
-#print(csv_TI4)
-
-#TI4_list = []
-#with open(TI4_input,'r') as file:
-    #for line in file:
-        #line = line.strip('') #or someother preprocessing
-        #TI4_list.append(line)
-
-#x_list= [list(t) for t in zip(*TI4_input)]
-
-#print(TI4_list)
-#print(x_list)
 
 TI4_data = [[0, 1.600000], [1, 2.682060], [2, 3.412390], [3, 3.887100], [4, 4.359370], 
 	    [5, 4.751090], [6, 5.032240], [7, 5.293740], [8, 5.556660], [9, 5.757480],
@@ -98,31 +82,14 @@ def daily_growth(TI_data):
   growth[0] = TI_data[0][0]
   return growth
 
-#print(list(range(len(TI4_data))))
-#daily_growth(TI4_data)
-
-#print(growth)
-
-#print(TI4_data) 
-
-#fix_log_data(TI4_data)
-#xdata,ydata = zip(*TI4_data)
-#xdata = np.array(xdata)
-#ydata = np.array(ydata)
-
-
-
 def prepare_data(dataset):
   """
   Unzips datasets into separate x-y arrays.
   """
-  xdata,ydata = zip(*dataset)
-  xdata = np.array(xdata)
-  ydata = np.array(ydata)
+  data_arr = np.array(dataset)
+  xdata,ydata = data_arr.T
   return xdata,ydata
   
-#print('xdata',prepare_data(TI4_data)[0])
-#print('ydata',prepare_data(TI4_data)[1])
 crossover_point = 21
 
 def base_fit(dataset):
@@ -152,7 +119,7 @@ def cache_fit(dataset):
   #return 1
 
 turning_point = base_fit(TI4_data)[2][21][1]
-#print(cache_fit(TI4_data))
+
 plt.figure('TI4')
 plt.subplot(2,1,1)
 plt.scatter(prepare_data(TI4_data)[0],prepare_data(TI4_data)[1],color='b',label='TI4 Data')
@@ -170,59 +137,17 @@ plt.legend(loc='lower right')
 plt.subplot(2,1,2)
 plt.ylabel('Millions of Dollars (USD)')
 plt.xlabel('Day')
-plt.title('Variance in Model Prediction vs. Data')
-plt.scatter(prepare_data(TI4_data)[0][:crossover_point],base_fit(TI4_data)[3][:crossover_point],color='m',label='base')
+plt.title('Deviation in Model Prediction vs. Data')
+plt.scatter(prepare_data(TI4_data)[0][:crossover_point], base_fit(TI4_data)[3][:crossover_point], color='m',label='base')
 plt.xticks(np.arange(0, max(prepare_data(TI4_data)[0])+1, 5))
-plt.scatter(prepare_data(TI4_data)[0][crossover_point+1:],cache_fit(TI4_data)[3][22:],color='m',label='cache')
+plt.scatter(prepare_data(TI4_data)[0][crossover_point+1:], cache_fit(TI4_data)[3][22:], color='m',label='cache')
 plt.grid(True)
 plt.legend(loc='best')
-
-
-
-#base fit
-#popt, pcov = curve_fit(base_log_func, xdata[0:21], ydata[0:21])
-#base_fit = np.array(list(zip(xdata,base_log_func(xdata, *popt))))
-#base_variance = variance(base_fit,TI4_data)
-#crossover_point = base_fit_fn[21][1]
-
-##cache fit
-#popt_cache, pcov_cache = curve_fit(cache1, xdata[21:], ydata[21:])
-#print('Final Estimate:',round(cache1(xdata, *popt_cache)[-1],2),'Million USD')
-#cache_fit = np.array(list(zip(xdata,cache1(xdata, *popt_cache))))
-#cache_variance = variance(cache_fit,TI4_data)
-
-##print(cache_variance)
 
 #print('Base fit',popt)
 #print('Base covariance',pcov)
 #print('Cache fit',popt_cache)
 #print('Cache covariance',np.array(pcov_cache))
-
-##plotting
-#plt.figure('TI4')
-#plt.subplot(2,1,1)
-#plt.scatter(xdata,ydata,color='b',label='TI4 Data')
-#plt.plot(xdata, base_log_func(xdata, *popt), 'r-', label='fit')
-#plt.plot(xdata, cache1(xdata, *popt_cache), 'r-', label='cache')
-#plt.yticks(np.arange(0, max(ydata)+1, 1))
-#plt.tick_params(labelbottom='off')
-#plt.xticks(np.arange(0, max(xdata)+1, 5))
-#plt.ylabel('Millions of Dollars (USD)')
-##plt.xlabel('Day')
-#plt.grid(True)
-#plt.title('Dota 2 International Prizepool')
-#plt.legend(loc='lower right')
-
-##plt.figure(2)
-#plt.subplot(2,1,2)
-#plt.ylabel('Millions of Dollars (USD)')
-#plt.xlabel('Day')
-#plt.title('Variance in Model Prediction vs. Data')
-#plt.scatter(xdata[:21],base_variance[:21],color='m',label='base')
-#plt.scatter(xdata[22:],cache_variance[22:],color='m',label='cache')
-#plt.xticks(np.arange(0, max(xdata)+1, 5))
-#plt.grid(True)
-#plt.legend(loc='best')
 
 
 plt.figure('Daily Change')
